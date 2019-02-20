@@ -17,7 +17,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, MarkerDialog.MarkerDialogListener {
 
@@ -25,6 +28,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LatLng position;
     private static final int REQUEST_CODE = 11;
     private LocationManager manager;
+
+    private Marker newMaker;
+    private Marker myLocation;
+    private ArrayList<Marker> markers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +42,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         manager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        markers = new ArrayList<>();
     }
 
 
@@ -53,6 +61,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
+        //mMap.setMyLocationEnabled(true);
+
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
@@ -62,11 +72,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         //Agregar el listener de ubicacion
-        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, new LocationListener() {
+        manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                Log.i(">>>","LAT: "+location.getLatitude()+ " , LONG: "+location.getLongitude());
-                Toast.makeText(getApplicationContext(), "LAT" + location.getLatitude() + ", LONG" + location.getLatitude(),Toast.LENGTH_SHORT).show();
+                LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
+                myLocation = mMap.addMarker(new MarkerOptions().position(pos).title("YO"));
+                
             }
 
             @Override
@@ -98,10 +109,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void createMarker(String title, String description) {
-        mMap.addMarker(new MarkerOptions()
+        newMaker = mMap.addMarker(new MarkerOptions()
                 .position(position)
                 .title(title)
                 .snippet(description));
+        markers.add(newMaker);
+
+        Log.i("MARKER", "CREADO");
+
     }
 
     @Override
