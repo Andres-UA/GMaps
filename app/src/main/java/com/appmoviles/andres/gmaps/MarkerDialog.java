@@ -25,13 +25,18 @@ public class MarkerDialog extends DialogFragment {
         final EditText et_place_name = v.findViewById(R.id.et_place_name);
         final EditText et_place_description = v.findViewById(R.id.et_place_description);
 
-        // Inflate and set the layout for the dialog
-        // Pass null as the parent view because its going in the dialog layout
         builder.setView(v)
                 .setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mListener.onDialogPositiveClick(MarkerDialog.this, et_place_name.getText().toString(), et_place_description.getText().toString());
+                        String name = et_place_name.getText().toString();
+                        String description = et_place_description.getText().toString();
+
+                        if (name.equals("") || name == null) {
+                            Toast.makeText(getContext(), "El nombre del lugar es obligatorio", Toast.LENGTH_LONG).show();
+                        } else {
+                            mListener.onDialogPositiveClick(MarkerDialog.this, name, description);
+                        }
                     }
                 })
                 .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
